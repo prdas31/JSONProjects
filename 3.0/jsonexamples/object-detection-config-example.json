@@ -1,0 +1,189 @@
+{
+  "version": "1.0",
+  "modelType": "ObjectDetection",
+  "metadata": {
+    "name": "Advanced Object Detection Model",
+    "description": "Configuration for a multi-class object detection model",
+    "author": "AI Assistant",
+    "dateCreated": "2024-08-10T12:00:00Z",
+    "lastModified": "2024-08-10T12:00:00Z"
+  },
+  "parameters": [
+    {
+      "id": "modelArchitecture",
+      "name": "Model Architecture",
+      "description": "The base architecture for the object detection model",
+      "type": "string",
+      "widgetType": "dropdown",
+      "default": "fasterRCNN",
+      "options": [
+        {"label": "Faster R-CNN", "value": "fasterRCNN"},
+        {"label": "YOLO", "value": "yolo"},
+        {"label": "SSD", "value": "ssd"}
+      ],
+      "required": true
+    },
+    {
+      "id": "objectClasses",
+      "name": "Object Classes",
+      "description": "Classes of objects the model should detect",
+      "type": "array",
+      "widgetType": "multiselect",
+      "dataSource": {
+        "type": "api",
+        "endpoint": "/api/object-detection/classes",
+        "method": "GET"
+      },
+      "children": [
+        {
+          "id": "classParameters",
+          "name": "Class Parameters",
+          "type": "object",
+          "widgetType": "group",
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/object-detection/class-parameters/${parentValue}",
+            "method": "GET"
+          }
+        }
+      ]
+    },
+    {
+      "id": "confidenceThreshold",
+      "name": "Confidence Threshold",
+      "description": "Minimum confidence score for object detection",
+      "type": "number",
+      "widgetType": "slider",
+      "default": 0.5,
+      "validation": {
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      },
+      "required": true
+    },
+    {
+      "id": "maxDetections",
+      "name": "Maximum Detections",
+      "description": "Maximum number of detections per image",
+      "type": "number",
+      "widgetType": "number",
+      "default": 100,
+      "validation": {
+        "min": 1,
+        "max": 1000,
+        "customValidation": "validateMaxDetections"
+      },
+      "required": true
+    },
+    {
+      "id": "useCustomAnchors",
+      "name": "Use Custom Anchors",
+      "description": "Enable custom anchor box configurations",
+      "type": "boolean",
+      "widgetType": "checkbox",
+      "default": false
+    },
+    {
+      "id": "customAnchors",
+      "name": "Custom Anchors",
+      "description": "Define custom anchor box sizes",
+      "type": "array",
+      "widgetType": "multiInput",
+      "validation": {
+        "customValidation": "validateCustomAnchors"
+      },
+      "dependencies": [
+        {
+          "on": "useCustomAnchors",
+          "condition": "value === true",
+          "action": "show"
+        }
+      ]
+    },
+    {
+      "id": "augmentationTechniques",
+      "name": "Data Augmentation Techniques",
+      "description": "Select data augmentation techniques to apply",
+      "type": "array",
+      "widgetType": "multiselect",
+      "options": [
+        {"label": "Horizontal Flip", "value": "horizontalFlip"},
+        {"label": "Vertical Flip", "value": "verticalFlip"},
+        {"label": "Random Crop", "value": "randomCrop"},
+        {"label": "Color Jitter", "value": "colorJitter"}
+      ],
+      "default": ["horizontalFlip"]
+    },
+    {
+      "id": "trainingParameters",
+      "name": "Training Parameters",
+      "description": "Set the parameters for model training",
+      "type": "object",
+      "widgetType": "group",
+      "children": [
+        {
+          "id": "batchSize",
+          "name": "Batch Size",
+          "type": "number",
+          "widgetType": "number",
+          "default": 32,
+          "validation": {
+            "min": 1,
+            "max": 256
+          }
+        },
+        {
+          "id": "learningRate",
+          "name": "Learning Rate",
+          "type": "number",
+          "widgetType": "number",
+          "default": 0.001,
+          "validation": {
+            "min": 0.0001,
+            "max": 0.1
+          }
+        },
+        {
+          "id": "epochs",
+          "name": "Number of Epochs",
+          "type": "number",
+          "widgetType": "number",
+          "default": 100,
+          "validation": {
+            "min": 1,
+            "max": 1000
+          }
+        }
+      ]
+    },
+    {
+      "id": "customModelPath",
+      "name": "Custom Model Path",
+      "description": "Path to a custom pre-trained model (optional)",
+      "type": "string",
+      "widgetType": "text",
+      "validation": {
+        "customValidation": "validateModelPath"
+      }
+    }
+  ],
+  "layout": {
+    "type": "sections",
+    "columns": 2
+  },
+  "localization": {
+    "en-US": {
+      "modelArchitecture": "Model Architecture",
+      "objectClasses": "Object Classes",
+      "confidenceThreshold": "Confidence Threshold",
+      "maxDetections": "Maximum Detections"
+    },
+    "es-ES": {
+      "modelArchitecture": "Arquitectura del Modelo",
+      "objectClasses": "Clases de Objetos",
+      "confidenceThreshold": "Umbral de Confianza",
+      "maxDetections": "Detecciones Máximas"
+    }
+  }
+}

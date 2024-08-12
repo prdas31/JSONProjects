@@ -1,0 +1,178 @@
+{
+  "properties": {
+    "transformerParameters": {
+      "type": "object",
+      "description": "Parameters specific to Transformer-based models and LLMs",
+      "properties": {
+        "architecture": {
+          "type": "string",
+          "enum": ["Encoder-only", "Decoder-only", "Encoder-Decoder"],
+          "description": "The overall architecture of the Transformer model"
+        },
+        "modelSize": {
+          "type": "object",
+          "properties": {
+            "hiddenSize": { "type": "number", "description": "Size of the hidden layers" },
+            "numLayers": { "type": "number", "description": "Number of layers in the model" },
+            "numHeads": { "type": "number", "description": "Number of attention heads" }
+          }
+        },
+        "vocabularySize": { "type": "number", "description": "Size of the model's vocabulary" },
+        "maxSequenceLength": { "type": "number", "description": "Maximum sequence length the model can handle" },
+        "tokenizer": {
+          "type": "object",
+          "properties": {
+            "type": { 
+              "type": "string", 
+              "enum": ["BPE", "WordPiece", "SentencePiece", "Unigram"],
+              "description": "Type of tokenizer used"
+            },
+            "vocabulary": { "type": "string", "description": "Path to the vocabulary file" }
+          }
+        },
+        "pretrainedModel": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "description": "Name of the pretrained model" },
+            "source": { "type": "string", "enum": ["HuggingFace", "OpenAI", "Custom"], "description": "Source of the pretrained model" },
+            "path": { "type": "string", "description": "Path to the pretrained model weights" }
+          }
+        },
+        "finetuning": {
+          "type": "object",
+          "properties": {
+            "freezeLayers": { "type": "array", "items": { "type": "string" }, "description": "List of layer names to freeze during fine-tuning" },
+            "taskSpecificHead": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string", "enum": ["Classification", "TokenClassification", "QuestionAnswering", "Summarization", "Translation"] },
+                "numLabels": { "type": "number", "description": "Number of output labels for classification tasks" }
+              }
+            }
+          }
+        },
+        "promptEngineering": {
+          "type": "object",
+          "properties": {
+            "templateFormat": { "type": "string", "description": "Format for prompt templates" },
+            "systemPrompt": { "type": "string", "description": "System-level prompt for setting context" },
+            "fewShotExamples": { 
+              "type": "array", 
+              "items": {
+                "type": "object",
+                "properties": {
+                  "input": { "type": "string" },
+                  "output": { "type": "string" }
+                }
+              },
+              "description": "Few-shot examples for in-context learning"
+            }
+          }
+        }
+      }
+    },
+    "trainingParameters": {
+      "type": "object",
+      "description": "Parameters specific to model training",
+      "properties": {
+        "epochs": { "type": "number" },
+        "batchSize": { "type": "number" },
+        "learningRate": { "type": "number" },
+        "optimizer": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string", "enum": ["Adam", "AdamW", "SGD", "RMSprop"] },
+            "parameters": { "type": "object" }
+          }
+        },
+        "lossFunction": { "type": "string" },
+        "regularization": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string", "enum": ["L1", "L2", "Dropout"] },
+            "value": { "type": "number" }
+          }
+        },
+        "learningRateSchedule": {
+          "type": "string",
+          "enum": ["Linear", "Cosine", "Warmup", "ReduceOnPlateau"]
+        },
+        "gradientAccumulationSteps": { "type": "number" },
+        "mixedPrecisionTraining": { "type": "boolean" },
+        "earlyStopping": {
+          "type": "object",
+          "properties": {
+            "monitor": { "type": "string" },
+            "patience": { "type": "number" },
+            "minDelta": { "type": "number" }
+          }
+        },
+        "checkpointing": {
+          "type": "object",
+          "properties": {
+            "frequency": { "type": "string" },
+            "path": { "type": "string" }
+          }
+        },
+        "dataAugmentation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "parameters": { "type": "object" }
+            }
+          }
+        }
+      }
+    },
+    "inferenceParameters": {
+      "type": "object",
+      "description": "Parameters specific to model inference",
+      "properties": {
+        "batchSize": { "type": "number" },
+        "deviceType": {
+          "type": "string",
+          "enum": ["CPU", "GPU", "TPU"]
+        },
+        "quantization": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "type": { "type": "string", "enum": ["INT8", "FP16"] }
+          }
+        },
+        "modelPath": { "type": "string" },
+        "decodingMethod": { 
+          "type": "string", 
+          "enum": ["Greedy", "Beam Search", "Nucleus Sampling", "Temperature Sampling"]
+        },
+        "temperature": { "type": "number" },
+        "topK": { "type": "number" },
+        "topP": { "type": "number" },
+        "beamSize": { "type": "number" },
+        "maxNewTokens": { "type": "number" },
+        "repetitionPenalty": { "type": "number" },
+        "stopSequences": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "distributedTraining": {
+      "type": "object",
+      "properties": {
+        "strategy": { 
+          "type": "string", 
+          "enum": ["DataParallel", "ModelParallel", "PipelineParallel", "ZeRO"]
+        },
+        "numGPUs": { "type": "number" },
+        "numNodes": { "type": "number" }
+      }
+    },
+    "evaluationMetrics": {
+      "type": "array",
+      "items": { 
+        "type": "string", 
+        "enum": ["Accuracy", "Precision", "Recall", "F1", "AUC", "MAP", "BLEU", "ROUGE", "Perplexity"]
+      }
+    }
+  }
+}

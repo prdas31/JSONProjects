@@ -1,0 +1,123 @@
+{
+  "version": "3.0",
+  "configType": "inference",
+  "modelType": "YOLOv8",
+  "metadata": {
+    "name": "YOLOv8 Object Detection Inference",
+    "description": "Configuration for inferencing with a YOLOv8 model",
+    "author": "AI Assistant",
+    "dateCreated": "2024-08-10T16:00:00Z",
+    "lastModified": "2024-08-10T16:00:00Z"
+  },
+  "parameters": [
+    {
+      "id": "modelPath",
+      "name": "Model Path",
+      "description": "Path to the trained YOLOv8 model",
+      "type": "string",
+      "widgetType": "text",
+      "category": "Model",
+      "applicableTo": ["inference"],
+      "required": true
+    },
+    {
+      "id": "confidenceThreshold",
+      "name": "Confidence Threshold",
+      "description": "Minimum confidence score for detections",
+      "type": "number",
+      "widgetType": "slider",
+      "category": "Inference",
+      "applicableTo": ["inference"],
+      "default": 0.25,
+      "validation": {
+        "min": 0,
+        "max": 1,
+        "step": 0.05
+      }
+    },
+    {
+      "id": "iouThreshold",
+      "name": "IOU Threshold",
+      "description": "Intersection over Union threshold for NMS",
+      "type": "number",
+      "widgetType": "slider",
+      "category": "Inference",
+      "applicableTo": ["inference"],
+      "default": 0.45,
+      "validation": {
+        "min": 0,
+        "max": 1,
+        "step": 0.05
+      }
+    },
+    {
+      "id": "maxDetections",
+      "name": "Maximum Detections",
+      "description": "Maximum number of detections per image",
+      "type": "number",
+      "widgetType": "number",
+      "category": "Inference",
+      "applicableTo": ["inference"],
+      "default": 300,
+      "validation": {
+        "min": 1,
+        "max": 1000
+      }
+    }
+  ],
+  "inferenceParameters": {
+    "batchSize": 1,
+    "deviceType": "GPU",
+    "quantization": {
+      "enabled": true,
+      "type": "FP16"
+    },
+    "modelPath": "/models/yolov8_trained_model.pt"
+  },
+  "preprocessing": [
+    {
+      "operation": "resize",
+      "parameters": {
+        "width": 640,
+        "height": 640
+      }
+    },
+    {
+      "operation": "normalize",
+      "parameters": {
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      }
+    }
+  ],
+  "postprocessing": [
+    {
+      "operation": "nms",
+      "parameters": {
+        "iouThreshold": 0.45
+      }
+    },
+    {
+      "operation": "filter",
+      "parameters": {
+        "minConfidence": 0.25
+      }
+    }
+  ],
+  "layout": {
+    "type": "sections",
+    "columns": 1
+  },
+  "localization": {
+    "en-US": {
+      "modelPath": "Model Path",
+      "confidenceThreshold": "Confidence Threshold",
+      "iouThreshold": "IOU Threshold"
+    },
+    "es-ES": {
+      "modelPath": "Ruta del Modelo",
+      "confidenceThreshold": "Umbral de Confianza",
+      "iouThreshold": "Umbral de IOU"
+    }
+  }
+}

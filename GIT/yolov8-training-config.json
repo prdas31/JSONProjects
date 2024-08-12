@@ -1,0 +1,125 @@
+{
+  "version": "3.0",
+  "configType": "training",
+  "modelType": "YOLOv8",
+  "metadata": {
+    "name": "YOLOv8 Object Detection Training",
+    "description": "Configuration for training a YOLOv8 model",
+    "author": "AI Assistant",
+    "dateCreated": "2024-08-10T15:00:00Z",
+    "lastModified": "2024-08-10T15:00:00Z"
+  },
+  "parameters": [
+    {
+      "id": "datasetPath",
+      "name": "Dataset Path",
+      "description": "Path to the training dataset",
+      "type": "string",
+      "widgetType": "text",
+      "category": "Data",
+      "applicableTo": ["training"],
+      "required": true
+    },
+    {
+      "id": "classes",
+      "name": "Object Classes",
+      "description": "Classes to be detected",
+      "type": "array",
+      "widgetType": "multiInput",
+      "category": "Model",
+      "applicableTo": ["training"],
+      "required": true
+    },
+    {
+      "id": "imageSize",
+      "name": "Image Size",
+      "description": "Input image size for the model",
+      "type": "number",
+      "widgetType": "number",
+      "category": "Model",
+      "applicableTo": ["training"],
+      "default": 640,
+      "validation": {
+        "min": 320,
+        "max": 1280,
+        "step": 32
+      }
+    },
+    {
+      "id": "augmentation",
+      "name": "Data Augmentation",
+      "description": "Data augmentation techniques to apply",
+      "type": "object",
+      "widgetType": "group",
+      "category": "Training",
+      "applicableTo": ["training"],
+      "children": [
+        {
+          "id": "flipHorizontal",
+          "name": "Horizontal Flip",
+          "type": "boolean",
+          "widgetType": "checkbox",
+          "default": true
+        },
+        {
+          "id": "rotate",
+          "name": "Rotation",
+          "type": "number",
+          "widgetType": "slider",
+          "default": 0,
+          "validation": {
+            "min": 0,
+            "max": 45,
+            "step": 5
+          }
+        },
+        {
+          "id": "mosaic",
+          "name": "Mosaic",
+          "type": "boolean",
+          "widgetType": "checkbox",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "trainingParameters": {
+    "epochs": 100,
+    "batchSize": 16,
+    "learningRate": 0.01,
+    "optimizer": "SGD",
+    "lossFunction": "CombinedLoss"
+  },
+  "preprocessing": [
+    {
+      "operation": "resize",
+      "parameters": {
+        "width": 640,
+        "height": 640
+      }
+    },
+    {
+      "operation": "normalize",
+      "parameters": {
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      }
+    }
+  ],
+  "layout": {
+    "type": "sections",
+    "columns": 2
+  },
+  "localization": {
+    "en-US": {
+      "datasetPath": "Dataset Path",
+      "classes": "Object Classes",
+      "imageSize": "Image Size"
+    },
+    "es-ES": {
+      "datasetPath": "Ruta del Conjunto de Datos",
+      "classes": "Clases de Objetos",
+      "imageSize": "Tamaño de Imagen"
+    }
+  }
+}
