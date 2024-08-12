@@ -1,0 +1,220 @@
+{
+  "version": "4.0",
+  "configType": "inference",
+  "modelType": "ObjectDetection",
+  "modelImplementation": {
+    "name": "YOLOv8",
+    "version": "8.0.0",
+    "framework": "PyTorch"
+  },
+  "metadata": {
+    "name": "YOLOv8 User-Configurable Inference",
+    "description": "Allows users to modify inference parameters for a YOLOv8 model",
+    "author": "AI Assistant",
+    "dateCreated": "2024-08-10T17:00:00Z",
+    "lastModified": "2024-08-10T17:00:00Z"
+  },
+  "parameters": [
+    {
+      "id": "objectClasses",
+      "name": "Object Classes",
+      "description": "Select classes to detect",
+      "type": "object",
+      "widgetType": "group",
+      "category": "Detection",
+      "applicableTo": ["inference"],
+      "children": [
+        {
+          "id": "person",
+          "name": "Person",
+          "type": "object",
+          "widgetType": "group",
+          "children": [
+            {
+              "id": "personDetection",
+              "name": "Detect Persons",
+              "type": "boolean",
+              "widgetType": "checkbox",
+              "default": true,
+              "applicableTo": ["inference"]
+            },
+            {
+              "id": "personAttributes",
+              "name": "Person Attributes",
+              "type": "multiProperties",
+              "widgetType": "group",
+              "properties": [
+                {
+                  "name": "Age Group",
+                  "type": "string",
+                  "widgetType": "dropdown",
+                  "options": [
+                    {"label": "Child", "value": "child"},
+                    {"label": "Adult", "value": "adult"},
+                    {"label": "Elderly", "value": "elderly"}
+                  ]
+                },
+                {
+                  "name": "Clothing Color",
+                  "type": "array",
+                  "widgetType": "multiselect",
+                  "options": [
+                    {"label": "Red", "value": "red"},
+                    {"label": "Blue", "value": "blue"},
+                    {"label": "Green", "value": "green"},
+                    {"label": "Yellow", "value": "yellow"}
+                  ]
+                }
+              ],
+              "applicableTo": ["inference"]
+            }
+          ],
+          "applicableTo": ["inference"]
+        },
+        {
+          "id": "vehicle",
+          "name": "Vehicle",
+          "type": "object",
+          "widgetType": "group",
+          "children": [
+            {
+              "id": "vehicleDetection",
+              "name": "Detect Vehicles",
+              "type": "boolean",
+              "widgetType": "checkbox",
+              "default": true,
+              "applicableTo": ["inference"]
+            },
+            {
+              "id": "vehicleAttributes",
+              "name": "Vehicle Attributes",
+              "type": "multiProperties",
+              "widgetType": "group",
+              "properties": [
+                {
+                  "name": "Type",
+                  "type": "string",
+                  "widgetType": "dropdown",
+                  "options": [
+                    {"label": "Car", "value": "car"},
+                    {"label": "Truck", "value": "truck"},
+                    {"label": "Motorcycle", "value": "motorcycle"}
+                  ]
+                },
+                {
+                  "name": "Color",
+                  "type": "string",
+                  "widgetType": "dropdown",
+                  "options": [
+                    {"label": "Red", "value": "red"},
+                    {"label": "Blue", "value": "blue"},
+                    {"label": "Green", "value": "green"},
+                    {"label": "Black", "value": "black"},
+                    {"label": "White", "value": "white"}
+                  ]
+                }
+              ],
+              "applicableTo": ["inference"]
+            }
+          ],
+          "applicableTo": ["inference"]
+        }
+      ]
+    },
+    {
+      "id": "detectionParameters",
+      "name": "Detection Parameters",
+      "type": "object",
+      "widgetType": "group",
+      "category": "Inference",
+      "applicableTo": ["inference"],
+      "children": [
+        {
+          "id": "confidenceThreshold",
+          "name": "Confidence Threshold",
+          "type": "number",
+          "widgetType": "slider",
+          "default": 0.25,
+          "validation": {
+            "min": 0,
+            "max": 1,
+            "step": 0.05
+          },
+          "applicableTo": ["inference"]
+        },
+        {
+          "id": "iouThreshold",
+          "name": "IOU Threshold",
+          "type": "number",
+          "widgetType": "slider",
+          "default": 0.45,
+          "validation": {
+            "min": 0,
+            "max": 1,
+            "step": 0.05
+          },
+          "applicableTo": ["inference"]
+        }
+      ]
+    }
+  ],
+  "inferenceParameters": {
+    "batchSize": 1,
+    "deviceType": "GPU",
+    "quantization": {
+      "enabled": true,
+      "type": "FP16"
+    },
+    "modelPath": "/models/yolov8_trained_model.pt",
+    "confidenceThreshold": 0.25,
+    "maxNewTokens": 100
+  },
+  "preprocessing": [
+    {
+      "operation": "resize",
+      "parameters": {
+        "width": 640,
+        "height": 640
+      }
+    },
+    {
+      "operation": "normalize",
+      "parameters": {
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      }
+    }
+  ],
+  "postprocessing": [
+    {
+      "operation": "nms",
+      "parameters": {
+        "iouThreshold": 0.45
+      }
+    },
+    {
+      "operation": "filter",
+      "parameters": {
+        "minConfidence": 0.25
+      }
+    }
+  ],
+  "layout": {
+    "type": "sections",
+    "columns": 2
+  },
+  "localization": {
+    "en-US": {
+      "objectClasses": "Object Classes",
+      "person": "Person",
+      "vehicle": "Vehicle",
+      "detectionParameters": "Detection Parameters"
+    },
+    "es-ES": {
+      "objectClasses": "Clases de Objetos",
+      "person": "Persona",
+      "vehicle": "Vehículo",
+      "detectionParameters": "Parámetros de Detección"
+    }
+  }
+}

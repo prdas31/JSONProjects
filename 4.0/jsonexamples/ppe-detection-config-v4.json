@@ -1,0 +1,222 @@
+{
+  "version": "4.0",
+  "configType": "inference",
+  "modelType": "ObjectDetection",
+  "modelImplementation": {
+    "name": "YOLOv5",
+    "version": "6.1",
+    "framework": "PyTorch"
+  },
+  "metadata": {
+    "name": "Construction Site PPE Detection",
+    "description": "Inference configuration for detecting PPE kit items",
+    "author": "AI Assistant",
+    "dateCreated": "2024-08-10T14:00:00Z",
+    "lastModified": "2024-08-10T14:00:00Z"
+  },
+  "parameters": [
+    {
+      "id": "ppeItems",
+      "name": "PPE Items",
+      "description": "Configure detection parameters for PPE items",
+      "type": "object",
+      "widgetType": "group",
+      "category": "PPE Items",
+      "applicableTo": ["inference"],
+      "children": [
+        {
+          "id": "helmet",
+          "name": "Helmet",
+          "type": "object",
+          "widgetType": "group",
+          "children": [
+            {
+              "id": "helmetColor",
+              "name": "Helmet Color",
+              "type": "array",
+              "widgetType": "multiselect",
+              "options": [
+                {"label": "Red", "value": "red"},
+                {"label": "Yellow", "value": "yellow"},
+                {"label": "White", "value": "white"},
+                {"label": "Blue", "value": "blue"}
+              ],
+              "default": ["yellow", "white"],
+              "dataSource": {
+                "type": "api",
+                "endpoint": "/api/ppe/helmet-colors",
+                "method": "GET"
+              },
+              "applicableTo": ["inference"]
+            },
+            {
+              "id": "helmetType",
+              "name": "Helmet Type",
+              "type": "string",
+              "widgetType": "dropdown",
+              "options": [
+                {"label": "Hard Hat", "value": "hardHat"},
+                {"label": "Bump Cap", "value": "bumpCap"}
+              ],
+              "default": "hardHat",
+              "applicableTo": ["inference"]
+            }
+          ],
+          "applicableTo": ["inference"]
+        },
+        {
+          "id": "jacket",
+          "name": "Safety Jacket",
+          "type": "object",
+          "widgetType": "group",
+          "children": [
+            {
+              "id": "jacketColor",
+              "name": "Jacket Color",
+              "type": "array",
+              "widgetType": "multiselect",
+              "options": [
+                {"label": "Orange", "value": "orange"},
+                {"label": "Yellow", "value": "yellow"},
+                {"label": "Green", "value": "green"}
+              ],
+              "default": ["orange", "yellow"],
+              "applicableTo": ["inference"]
+            }
+          ],
+          "applicableTo": ["inference"]
+        },
+        {
+          "id": "shoes",
+          "name": "Safety Shoes",
+          "type": "boolean",
+          "widgetType": "checkbox",
+          "default": true,
+          "applicableTo": ["inference"]
+        },
+        {
+          "id": "glasses",
+          "name": "Safety Glasses",
+          "type": "boolean",
+          "widgetType": "checkbox",
+          "default": true,
+          "applicableTo": ["inference"]
+        },
+        {
+          "id": "gloves",
+          "name": "Safety Gloves",
+          "type": "boolean",
+          "widgetType": "checkbox",
+          "default": true,
+          "applicableTo": ["inference"]
+        }
+      ]
+    },
+    {
+      "id": "detectionThreshold",
+      "name": "Detection Threshold",
+      "description": "Minimum confidence score for object detection",
+      "type": "number",
+      "widgetType": "slider",
+      "category": "Detection Parameters",
+      "applicableTo": ["inference"],
+      "default": 0.5,
+      "validation": {
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      }
+    },
+    {
+      "id": "postProcessing",
+      "name": "Post-processing Options",
+      "type": "object",
+      "widgetType": "group",
+      "category": "Post-processing",
+      "applicableTo": ["inference"],
+      "children": [
+        {
+          "id": "nmsThreshold",
+          "name": "NMS Threshold",
+          "type": "number",
+          "widgetType": "slider",
+          "default": 0.4,
+          "validation": {
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          },
+          "applicableTo": ["inference"]
+        },
+        {
+          "id": "minPPEItems",
+          "name": "Minimum Required PPE Items",
+          "type": "number",
+          "widgetType": "number",
+          "default": 3,
+          "validation": {
+            "min": 1,
+            "max": 5
+          },
+          "applicableTo": ["inference"]
+        }
+      ]
+    }
+  ],
+  "inferenceParameters": {
+    "batchSize": 1,
+    "deviceType": "GPU",
+    "quantization": {
+      "enabled": true,
+      "type": "FP16"
+    },
+    "modelPath": "/models/ppe_detection_v1.0.pb",
+    "confidenceThreshold": 0.5
+  },
+  "preprocessing": [
+    {
+      "operation": "resize",
+      "parameters": {
+        "width": 640,
+        "height": 640
+      }
+    },
+    {
+      "operation": "normalize",
+      "parameters": {
+        "mean": [0.485, 0.456, 0.406],
+        "std": [0.229, 0.224, 0.225]
+      }
+    }
+  ],
+  "postprocessing": [
+    {
+      "operation": "nms",
+      "parameters": {
+        "iouThreshold": 0.5
+      }
+    },
+    {
+      "operation": "filter",
+      "parameters": {
+        "minConfidence": 0.5
+      }
+    }
+  ],
+  "layout": {
+    "type": "sections",
+    "columns": 2
+  },
+  "localization": {
+    "en-US": {
+      "ppeItems": "PPE Items",
+      "helmet": "Helmet",
+      "jacket": "Safety Jacket"
+    },
+    "es-ES": {
+      "ppeItems": "Elementos de EPP",
+      "helmet": "Casco",
+      "jacket": "Chaleco de seguridad"
+    }
+  }
+}
