@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated schema structure to be more flexible and extensible
 - Updated all jsonexamples to comply to version 4.0 schema
+- Added Parsing Services Layer examples
+- Added Angular Code to parse a JSON (4.0 compatible) file that uses the Parsing Services Layers
 
 ## [3.0.0] - [Date of previous major version]
 ### Added
